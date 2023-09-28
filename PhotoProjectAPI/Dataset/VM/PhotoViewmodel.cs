@@ -3,7 +3,7 @@ using PhotoProjectAPI.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace album_photo_web_api.Data.ViewModels
+namespace PhotoProjectAPI.Dataset.VM
 {
     public class PhotoViewmodel
     {

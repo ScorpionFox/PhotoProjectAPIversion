@@ -23,16 +23,16 @@ namespace PhotoProjectAPI.Controllers
         {
             try
             {
-                if (fileUpload.Files.Length > 0)
+                if (fileUpload.files.Length > 0)
                 {
                     string path = _webHostEnviroment.WebRootPath + "\\uploads\\";
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
-                    using (FileStream fileStream=System.IO.File.Create(path+ fileUpload.Files.FileName))
+                    using (FileStream fileStream=System.IO.File.Create(path+ fileUpload.files.FileName))
                     {
-                        fileUpload.Files.CopyTo(fileStream);
+                        fileUpload.files.CopyTo(fileStream);
                         fileStream.Flush();
                         return "Upload Done.";
                     }
@@ -55,14 +55,35 @@ namespace PhotoProjectAPI.Controllers
         public async Task<IActionResult> Get([FromRoute] string fileName)
         {
             string path = _webHostEnviroment.WebRootPath + "\\uploads\\";
-            var filePath = path + fileName + ".png";
+            var filePath = path + fileName;
+
             if (System.IO.File.Exists(filePath))
             {
                 byte[] b = System.IO.File.ReadAllBytes(filePath);
-                // POBIERA NARAZIE TYLKO W FORMACIE PNG !!!!
-                return File(b, "image/png");
+                string fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+
+                // Określ ContentType na podstawie rozszerzenia pliku
+                string contentType = "application/octet-stream"; // Domyślny ContentType
+
+                // Dodaj obsługę różnych rozszerzeń plików
+                if (fileExtension == ".png")
+                {
+                    contentType = "image/png";
+                }
+                else if (fileExtension == ".jpg" || fileExtension == ".jpeg")
+                {
+                    contentType = "image/jpeg";
+                }
+                else if (fileExtension == ".gif")
+                {
+                    contentType = "image/gif";
+                }
+                // Dodaj obsługę innych rozszerzeń, jeśli jest to konieczne
+
+                return File(b, contentType);
             }
-            return null;
+
+            return NotFound(); // Możesz zwrócić NotFound, jeśli plik nie istnieje
         }
     }
 }

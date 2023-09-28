@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using PhotoProjectAPI.Dataset;
 
 namespace PhotoProjectAPI.Models
 {
@@ -11,7 +12,10 @@ namespace PhotoProjectAPI.Models
         public string Name { get; set; }
         public List<PhotoAlbum>? AlbumsPhotos { get; set; }
         public string UserId { get; set; }
+
         [ForeignKey("UserId")]
         public User User { get; set; }
+
+        public Accessibility Access { get; set; }
     }
 }

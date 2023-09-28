@@ -1,4 +1,6 @@
-﻿namespace PhotoProjectAPI.DTO
+﻿using PhotoProjectAPI.Dataset;
+
+namespace PhotoProjectAPI.DTO
 {
     public class AlbumDTO
     {
@@ -7,5 +9,7 @@
         public string? User { get; set; }
         public string UserId { get; set; }
         public List<PhotoDTO> Photos { get; set; }
+
+        public Accessibility Access { get; set; }
     }
 }

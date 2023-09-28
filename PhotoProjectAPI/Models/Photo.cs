@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
+using PhotoProjectAPI.Dataset;
 
 namespace PhotoProjectAPI.Models
 {
@@ -26,5 +26,11 @@ namespace PhotoProjectAPI.Models
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
+
+        public Accessibility Access { get; set; }
+
+        public int Likes { get; set; }
+        public int Dislikes { get; set; }
+        public List<Ratings>? Rates { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace PhotoProjectAPI.Models
         public IFormFile ImageFile { get; set; }
         public string ImageName { get; set; }
 
-        public List<PhotoAlbum>? AlbumsPhotos { get; set; }
+        public List<PhotoAlbum>? PhotoAlbums { get; set; }
 
         public List<Comment>? Comments { get; set; }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-
+using PhotoProjectAPI.Data;
 
 namespace PhotoProjectAPI
 {
@@ -36,6 +36,16 @@ namespace PhotoProjectAPI
 
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
+
+            // Do appDbSeedera 
+            var serviceProvider = app.ApplicationServices;
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<AppDbSeeder>();
+                seeder.SeedDatabase();
+                seeder.SeedRolesAsync().Wait();
+                seeder.SeedUsersAsync().Wait();
+            }
 
             app.UseHttpsRedirection();
             app.UseRouting();

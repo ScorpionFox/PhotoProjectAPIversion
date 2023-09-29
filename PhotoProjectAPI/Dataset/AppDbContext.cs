@@ -15,6 +15,7 @@ namespace PhotoProjectAPI.Data
         public DbSet<PhotoAlbum> PhotoAlbums { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Ratings> Ratings { get; set; }
+        public DbSet<TokenRefreshment> TokenRefreshments { get; set; }
         
 
 

@@ -19,7 +19,7 @@ namespace PhotoProjectAPI.Data
         
 
 
-        /* dokonczyc a potem migracja, jak projekt bedzie dzialal to na koncu AppDbSeeder jakis trzeba zrobic */
+        /* skonczony, teraz users, appdbseeder i migracja */
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

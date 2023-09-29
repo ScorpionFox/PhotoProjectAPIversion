@@ -26,7 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
+    <Folder Include="Dataset\Interfaces\" />
+    <Folder Include="Dataset\Services\" />
   </ItemGroup>
 
 </Project>

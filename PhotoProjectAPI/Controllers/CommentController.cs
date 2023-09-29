@@ -23,7 +23,7 @@ namespace PhotoProjectAPI.Controllers
         }
 
         [HttpPut("UpdateComment")]
-        public async Task<IActionResult> UpdateComment([FromBody] CommentsViewmodel comment)
+        public async Task<IActionResult> UpdateComment([FromBody] CommentsViewmodel comment) // za pomocą id
         {
             return Ok();
         }

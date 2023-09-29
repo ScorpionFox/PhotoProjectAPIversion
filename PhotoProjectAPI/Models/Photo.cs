@@ -31,6 +31,6 @@ namespace PhotoProjectAPI.Models
 
         public int Likes { get; set; }
         public int Dislikes { get; set; }
-        public List<Ratings>? Rates { get; set; }
+        public List<Ratings>? Ratings { get; set; }
     }
 }

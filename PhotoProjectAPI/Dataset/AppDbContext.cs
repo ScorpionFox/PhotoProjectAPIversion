@@ -14,6 +14,8 @@ namespace PhotoProjectAPI.Data
         public DbSet<Album> Albums { get; set; }
         public DbSet<PhotoAlbum> PhotoAlbums { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Ratings> Ratings { get; set; }
+        
 
 
         /* dokonczyc a potem migracja, jak projekt bedzie dzialal to na koncu AppDbSeeder jakis trzeba zrobic */
@@ -37,6 +39,9 @@ namespace PhotoProjectAPI.Data
                 .HasMany<Comment>(c => c.Comments)
                 .WithOne(s => s.Photo)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Photo>()
+               .HasMany<Ratings>(r => r.Ratings)
+               .WithOne(p => p.Photo);
 
 
             base.OnModelCreating(modelBuilder);

@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dataset\VM\Trzeba zrobić uwierzytelnianie potem, tokeny tez\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
 

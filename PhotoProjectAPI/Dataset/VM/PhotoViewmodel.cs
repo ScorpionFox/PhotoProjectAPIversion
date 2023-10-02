@@ -15,7 +15,7 @@ namespace PhotoProjectAPI.Dataset.VM
         public Accessibility Access { get; set; }      
     }
 
-    public class PhotoUpdateVM
+    public class PhotoUpdateViewmodel
     {
         public string Name { get; set; }
         public string Tags { get; set; }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhotoProjectAPI.Data;
+using PhotoProjectAPI.Data.Services;
+using PhotoProjectAPI.Dataset.Services;
 using PhotoProjectAPI.Models;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -21,7 +23,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-//TUTAJ USLUGI DODAC
+//Services
+builder.Services.AddTransient<PhotoService>();
+builder.Services.AddTransient<AlbumService>();
+builder.Services.AddTransient<CommentService>();
+//builder.Services.AddTransient<PhotoAlbumService>();
 
 //Identity
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -100,8 +106,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Authorization & Authentication
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
+
+app.UseSwaggerUI(); //potrzebne?
 
 app.Run();

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using PhotoProjectAPI.Data;
+using PhotoProjectAPI.Mapper;
 
 namespace PhotoProjectAPI
 {
@@ -18,6 +19,7 @@ namespace PhotoProjectAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
             services.AddSwaggerGen(o=>o.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {
@@ -25,6 +27,7 @@ namespace PhotoProjectAPI
                 Version="v1",
                 Description = "Des1"
             }));
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

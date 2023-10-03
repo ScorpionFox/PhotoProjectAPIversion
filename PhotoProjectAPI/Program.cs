@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhotoProjectAPI.Data;
+using PhotoProjectAPI.Data.Interfaces;
 using PhotoProjectAPI.Data.Services;
 using PhotoProjectAPI.Dataset.Services;
+using PhotoProjectAPI.Mapper;
 using PhotoProjectAPI.Models;
+using PhotoProjectAPI.Repository;
+using PhotoProjectAPI.Repository.Interface;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -24,10 +28,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 //Services
-builder.Services.AddTransient<PhotoService>();
-builder.Services.AddTransient<AlbumService>();
-builder.Services.AddTransient<CommentService>();
+builder.Services.AddScoped<IAlbumService, AlbumService>();
+//builder.Services.AddTransient<PhotoService>();
+//builder.Services.AddTransient<CommentService>();
 //builder.Services.AddTransient<PhotoAlbumService>();
+
+//Repository
+builder.Services.AddScoped<IAlbumRepostiory, AlbumRepostiory>();
 
 //Identity
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -68,7 +75,8 @@ builder.Services.AddAuthentication(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
+var mappingConfig = AutoMapperConfig.Initialize();
+builder.Services.AddSingleton(mappingConfig);
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

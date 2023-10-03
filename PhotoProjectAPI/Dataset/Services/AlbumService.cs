@@ -5,133 +5,27 @@ using PhotoProjectAPI.DTO;
 using Microsoft.EntityFrameworkCore;
 using PhotoProjectAPI.Data.Interfaces;
 using PhotoProjectAPI.Data;
-//helper
-//trzeba helper w serwisach dorobić do albumu i do zdjęć żeby w jednym miejscu zapisywalo zdjęcia
+using PhotoProjectAPI.Repository.Interface;
+using AutoMapper;
+
 namespace PhotoProjectAPI.Data.Services
 {
 
-    //zaimplementować
     public class AlbumService : IAlbumService
     {
-        private AppDbContext _context;
-        public AlbumService(AppDbContext context)
+        private readonly IAlbumRepostiory _albumRepository;
+        private readonly IMapper _mapper;
+
+        public AlbumService(IAlbumRepostiory albumRepository, IMapper mapper)
         {
-            _context = context;
+            _albumRepository = albumRepository;
+            _mapper = mapper;
         }
 
-        public bool AddPhotoToAlbumUsingIds(bool isAdmin, string currentUserId, int albumId, List<int> photoIds)
+        public async Task<List<AlbumDTO>> GetAlbumAsync(int? albumid = null, string? accessNumber = null)
         {
-            throw new NotImplementedException();
-        }
-
-        public string ChangeAlbumAccessForAllUsingId(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string ChangeAlbumAccessUsingId(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CreateAlbum(AlbumViewmodel album, string userId, bool isAdmin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string DeleteAlbumAndPhotos(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteAlbumUsingId(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DoesAlbumExist(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PhotoAlbum GetAlbumPhotoUsingIds(int albumId, int photoId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<AlbumDTO> GetAlbumsUsingAuthorId(string authorId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<AlbumDTO> GetAlbumsUsingAuthorName(string authorName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<AlbumDTO> GetAlbumsUsingName(string albumName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public AlbumDTO GetAlbumUsingId(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Album GetAlbumUsingIdPriv(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<AlbumDTO> GetAllAlbums()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<PhotoDTO> GetAllPhotosFromAlbum(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetUserIdUsingAlbumId(int albumId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasAlbumAccess(int albumId, string userId, bool isAdmin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasAlbumPrivileges(int albumId, string userId, bool isAdmin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasAlbumPrivilegesWithDestAlbumId(int albumId, int destAlbumId, string userId, bool isAdmin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasPhotoPrivileges(int photoId, string userId, bool isAdmin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MovePhotosToAlbum(bool isAdmin, string currentUserId, int currentAlbumId, int destinationAlbumId, List<int> photoIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool RemovePhotoFromAlbumUsingId(bool isAdmin, string currentUserId, int albumId, List<int> photoIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public AlbumDTO UpdateAlbum(int albumId, [FromForm] AlbumUpdateViewmodel album, string userId)
-        {
-            throw new NotImplementedException();
+            var album = await _albumRepository.GetAlbum(albumid,accessNumber).ConfigureAwait(false);
+            return _mapper.Map<List<AlbumDTO>>(album);
         }
     }
 }

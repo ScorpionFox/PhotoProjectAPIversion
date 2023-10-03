@@ -65,19 +65,6 @@ namespace PhotoProjectAPI.Controllers
                 return NotFound();
             }
         }
-
-        [HttpPut("UpdatePhoto")]
-        public async Task<IActionResult> UpdatePhoto([FromForm] PhotoUpdateVM photo)
-        {
-            
-            return Ok();
-        }
-
-        [HttpDelete("DeletePhoto")]
-        public async Task<IActionResult> DeletePhoto([FromForm] PhotoUpdateVM photo)
-        {
-            return Ok();
-        }
     }
 }
         

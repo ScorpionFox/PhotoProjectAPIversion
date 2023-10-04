@@ -2,8 +2,8 @@
 {
     public class RequestForTokenViewmodel
     {
-        public string Token { get; set; }
-        public string TokenRefreshment { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
 
     }
 }

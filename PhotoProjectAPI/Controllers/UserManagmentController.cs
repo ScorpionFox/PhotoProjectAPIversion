@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Win32;
 using PhotoProjectAPI.Data;
-using PhotoProjectAPI.Dataset.VM;
 using PhotoProjectAPI.Dataset.VM.UserManagment;
 using PhotoProjectAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -66,14 +63,14 @@ namespace PhotoProjectAPI.Controllers
             }
 
             var authClaims = new List<Claim>()
-    {
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Role, Role),
-        new Claim(JwtRegisteredClaimNames.Name, user.UserName),
-        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, Role),
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
 
@@ -121,7 +118,7 @@ namespace PhotoProjectAPI.Controllers
             try
             {
                 // Weryfikacja formatu JWT
-                var tokenInVerification = jwtTokenHandler.ValidateToken(request.Token, _tokenValidationParameters, out var validatedToken);
+                var tokenInVerification = jwtTokenHandler.ValidateToken(request.Login, _tokenValidationParameters, out var validatedToken);
 
                 // Sprawdzenie algorytmu szyfrowania
                 if (validatedToken is JwtSecurityToken jwtSecurityToken && !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
@@ -139,7 +136,7 @@ namespace PhotoProjectAPI.Controllers
                 }
 
                 // Sprawdzenie czy token istnieje w bazie danych
-                var dbRefreshToken = await _context.TokenRefreshments.FirstOrDefaultAsync(n => n.Token == request.TokenRefreshment);
+                var dbRefreshToken = await _context.TokenRefreshments.FirstOrDefaultAsync(n => n.Token == request.Password);
 
                 if (dbRefreshToken == null)
                 {
@@ -168,17 +165,17 @@ namespace PhotoProjectAPI.Controllers
 
                 // Generowanie nowego tokenu na podstawie istniejącego refresh tokenu
                 var dbUser = await _userManager.FindByIdAsync(dbRefreshToken.UserId);
-                var newTokenResponse = await TokenGeneratorAsync(dbUser, request.TokenRefreshment);
+                var newTokenResponse = await TokenGeneratorAsync(dbUser, request.Password);
 
                 return newTokenResponse;
             }
             catch (SecurityTokenExpiredException)
             {
-                var dbRefreshToken = await _context.TokenRefreshments.FirstOrDefaultAsync(n => n.Token == request.TokenRefreshment);
+                var dbRefreshToken = await _context.TokenRefreshments.FirstOrDefaultAsync(n => n.Token == request.Password);
 
                 // Generowanie nowego tokenu na podstawie istniejącego refresh tokenu
                 var dbUser = await _userManager.FindByIdAsync(dbRefreshToken.UserId);
-                var newTokenResponse = await TokenGeneratorAsync(dbUser, request.TokenRefreshment);
+                var newTokenResponse = await TokenGeneratorAsync(dbUser, request.Password);
 
                 return newTokenResponse;
             }
@@ -250,6 +247,6 @@ namespace PhotoProjectAPI.Controllers
             var tokenValue = await TokenGeneratorAsync(user, "");
             return Ok(tokenValue);
 
-        }      
+        }
     }
 }

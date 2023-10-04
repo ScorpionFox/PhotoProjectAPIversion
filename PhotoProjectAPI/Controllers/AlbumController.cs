@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhotoProjectAPI.Data.Interfaces;
 using PhotoProjectAPI.Dataset.VM;
 
 namespace PhotoProjectAPI.Controllers
 {
+   
     [Route("[controller]")]
-    [ApiController]
     public class AlbumController : ControllerBase
     {
         private readonly IAlbumService _albumService;
@@ -30,7 +31,12 @@ namespace PhotoProjectAPI.Controllers
         [Route("Create")]
         public async Task<IActionResult> AddAlbum([FromBody] AlbumViewmodel album)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var albumId = await _albumService.AddAlbumAsync(album);
+
+            return Created("", albumId);
         }
 
         [HttpPut]

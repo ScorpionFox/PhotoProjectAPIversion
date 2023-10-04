@@ -25,6 +25,12 @@ namespace PhotoProjectAPI.Data
                 entity.ToTable("Album")
                     .HasKey(x => x.Id);
             });
+            modelBuilder.Entity<PhotoAlbum>().HasKey(ap => new
+            {
+                ap.Id,
+            });
+            modelBuilder.Entity<PhotoAlbum>().HasOne(a => a.Photo).WithMany(ap => ap.PhotoAlbums).HasForeignKey(a => a.PhotoId);
+            modelBuilder.Entity<PhotoAlbum>().HasOne(a => a.Album).WithMany(ap => ap.PhotoAlbums).HasForeignKey(a => a.AlbumId);
         }
     }
 }

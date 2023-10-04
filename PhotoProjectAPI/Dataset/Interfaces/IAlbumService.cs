@@ -8,5 +8,6 @@ namespace PhotoProjectAPI.Data.Interfaces
     public interface IAlbumService
     {
         Task<List<AlbumDTO>> GetAlbumAsync(int? albumid = null, string? accessNumber = null);
+        Task<int> AddAlbumAsync(AlbumViewmodel albumViewmodel);
     }
 }

@@ -67,14 +67,14 @@ namespace PhotoProjectAPI.Controllers
         }
 
         [HttpPut("UpdatePhoto")]
-        public async Task<IActionResult> UpdatePhoto([FromForm] PhotoUpdateVM photo)
+        public async Task<IActionResult> UpdatePhoto([FromForm] PhotoUpdateViewmodel photo)
         {
             
             return Ok();
         }
 
         [HttpDelete("DeletePhoto")]
-        public async Task<IActionResult> DeletePhoto([FromForm] PhotoUpdateVM photo)
+        public async Task<IActionResult> DeletePhoto([FromForm] PhotoUpdateViewmodel photo)
         {
             return Ok();
         }

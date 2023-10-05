@@ -5,8 +5,8 @@ using PhotoProjectAPI.DTO;
 using Microsoft.EntityFrameworkCore;
 using PhotoProjectAPI.Data.Interfaces;
 using PhotoProjectAPI.Data;
-//helper
-//trzeba helper w serwisach dorobić do albumu i do zdjęć żeby w jednym miejscu zapisywalo zdjęcia
+using PhotoProjectAPI.Dataset.PathManager;
+
 namespace PhotoProjectAPI.Data.Services
 {
 

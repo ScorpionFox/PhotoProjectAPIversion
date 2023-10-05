@@ -13,7 +13,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Security.Claims;
 using PhotoProjectAPI.Data;
-//helper
+using PhotoProjectAPI.Dataset.PathManager;
+
 namespace PhotoProjectAPI.Dataset.Services
 {
     public class PhotoService : IPhotoService

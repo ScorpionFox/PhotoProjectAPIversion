@@ -1,10 +1,9 @@
-﻿namespace PhotoProjectAPI.DTO
+﻿namespace PhotoProjectAPI.Dto
 {
-    public class CommentDTO
+    public class CommentDto
     {
         public int Id { get; set; }
-        public string AuthorId { get; set; }
         public string Comment { get; set; }
-        
+        public string AuthorId { get; set; }
     }
 }

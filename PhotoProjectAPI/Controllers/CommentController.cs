@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PhotoProjectAPI.Dataset.VM;
+﻿using PhotoProjectAPI.Data;
+using PhotoProjectAPI.Data.Interfaces;
+using PhotoProjectAPI.Data.Services;
+using PhotoProjectAPI.Data.ViewModels;
 using PhotoProjectAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Security.Claims;
 
 namespace PhotoProjectAPI.Controllers
 {
@@ -9,29 +14,70 @@ namespace PhotoProjectAPI.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-
-        [HttpGet("GetComments/{photoId}")]
-        public async Task<IActionResult> GetComments([FromRoute] int photoId)
+        public CommentService _commentService;
+        public PhotoService _photoService;
+        public CommentController(CommentService commentService, PhotoService photoService)
         {
-            return Ok();
+            _commentService = commentService;
+            _photoService = photoService;
+        }
+        [HttpGet("get-all-comments-by-photo/{photoId}")]
+        public IActionResult GetCommentsByPhotoId(int photoId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
+            if (_photoService.PhotoExists(photoId) == false || _photoService.HasAccess(photoId, userId, isAdmin) == false)
+                return NotFound();
+            else
+            {
+                var obj = _commentService.GetAllCommentsByPhoto(photoId);
+                return Ok(obj);
+            }
+
+
+
         }
 
-        [HttpPost("AddComment")]
-        public async Task<IActionResult> AddComment([FromBody] CommentsViewmodel comment)
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPost("add-comment-to-photo/{photoId}")]
+        public IActionResult AddCommentToPhoto(int photoId, CommentVM comment)
         {
-            return Ok();
+            var photo = _photoService.GetPhotoById(photoId);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
+
+            if (photo == null || string.IsNullOrWhiteSpace(comment.Comment) == true)
+                return BadRequest();
+            else
+            {
+                bool hasAccess = _photoService.HasAccess(photoId, userId, isAdmin);
+                bool isAuthor = _commentService.IsAuthor(photoId, userId, isAdmin);
+                if (isAuthor || hasAccess == false)
+                    return Forbid();
+                else
+                {
+                    _commentService.AddComment(comment, userId, photoId);
+                    return Ok();
+                }
+            }
         }
 
-        [HttpPut("UpdateComment")]
-        public async Task<IActionResult> UpdateComment([FromBody] CommentsViewmodel comment) // za pomocą id
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpGet("delete-comment-by-id/{commentId}")]
+        public IActionResult DeleteCommentById(int commentId)
         {
-            return Ok();
-        }
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
 
-        [HttpDelete("DeleteComment/{id}")]
-        public async Task<IActionResult> DeleteComment([FromRoute] int id)
-        {
-            return Ok();
+            if (_commentService.CommentExists(commentId) == false)
+                return NotFound();
+            else if (_commentService.HasPriveleges(commentId, userId, isAdmin) == false)
+                return Forbid();
+            else
+            {
+                _commentService.DeleteCommentById(commentId);
+                return Ok();
+            }
         }
     }
 }

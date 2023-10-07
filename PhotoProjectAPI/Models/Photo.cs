@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using PhotoProjectAPI.Dataset;
+using PhotoProjectAPI.Data;
+using PhotoProjectAPI.Models;
 
 namespace PhotoProjectAPI.Models
 {
@@ -14,23 +15,25 @@ namespace PhotoProjectAPI.Models
 
         public string Tags { get; set; }
         public string Camera { get; set; }
-
+        public AccessLevel Access { get; set; }
         [NotMapped]
         public IFormFile ImageFile { get; set; }
         public string ImageName { get; set; }
 
-        public List<PhotoAlbum>? PhotoAlbums { get; set; }
+        // relationship photo ---< rates
+        public int UpVotes { get; set; }
+        public int DownVotes { get; set; }
+        public List<Rate>? Rates { get; set; }
 
+        // relationship photos >--< albums 
+        public List<AlbumPhoto>? AlbumsPhotos { get; set; }
+
+        // relationship photo -----< comments
         public List<Comment>? Comments { get; set; }
 
+        // relationship user ---< photos
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
-
-        public Accessibility Access { get; set; }
-
-        public int Likes { get; set; }
-        public int Dislikes { get; set; }
-        public List<Ratings>? Ratings { get; set; }
     }
 }

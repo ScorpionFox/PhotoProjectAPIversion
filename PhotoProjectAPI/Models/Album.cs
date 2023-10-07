@@ -1,21 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhotoProjectAPI.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using PhotoProjectAPI.Dataset;
+using System.ComponentModel;
+using PhotoProjectAPI.Models;
 
 namespace PhotoProjectAPI.Models
 {
     public class Album
     {
-
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<PhotoAlbum>? PhotoAlbums { get; set; }
+        public AccessLevel Access { get; set; }
+        // relationship photos >--< albums
+        public List<AlbumPhoto>? AlbumsPhotos { get; set; }
+        // relationship user ---< photos
         public string UserId { get; set; }
-
         [ForeignKey("UserId")]
         public User User { get; set; }
-
-        public Accessibility Access { get; set; }
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhotoProjectAPI.Data;
 using PhotoProjectAPI.Data.Services;
-using PhotoProjectAPI.Dataset.Services;
 using PhotoProjectAPI.Models;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,26 +16,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
-//Database Connection
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 //Services
-builder.Services.AddTransient<PhotoService>();
 builder.Services.AddTransient<AlbumService>();
+builder.Services.AddTransient<PhotoService>();
 builder.Services.AddTransient<CommentService>();
 //builder.Services.AddTransient<PhotoAlbumService>();
 
-//Identity
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-
-//Validation parametrs for tokens
+// Validation for Token Parameters
 var tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,
@@ -53,6 +45,12 @@ var tokenValidationParameters = new TokenValidationParameters()
 };
 builder.Services.AddSingleton(tokenValidationParameters);
 
+// Add Identity
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
 //JWT Bearer and Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -68,7 +66,6 @@ builder.Services.AddAuthentication(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -95,6 +92,7 @@ builder.Services.AddSwaggerGen(options =>
     }
     });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -107,11 +105,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Authorization & Authentication
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.MapControllers();
 
 app.UseSwaggerUI(); //potrzebne?
+
+AppDbSeeder.SeedUsersAndRolesAsync(app).Wait();
 
 app.Run();

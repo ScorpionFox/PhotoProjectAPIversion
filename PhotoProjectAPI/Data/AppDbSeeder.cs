@@ -29,7 +29,7 @@ namespace PhotoProjectAPI.Data
                 if (!await roleManager.RoleExistsAsync(UserRoles.User))
                     await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
 
-                //Admins
+             
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var adminUser = await userManager.FindByNameAsync("admin");
                 if (adminUser == null)
@@ -38,13 +38,10 @@ namespace PhotoProjectAPI.Data
                     {
                         UserName = "admin",
                     };
-                    await userManager.CreateAsync(newAdminUser, "Test123!");
+                    await userManager.CreateAsync(newAdminUser, "Haslo56!");
                     await userManager.AddClaimAsync(newAdminUser, new Claim(ClaimTypes.Role, "ADMIN"));
                     await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
-                }
-
-                //Users
-
+                }              
                 var user = await userManager.FindByNameAsync("user");
                 if (user == null)
                 {
@@ -52,7 +49,7 @@ namespace PhotoProjectAPI.Data
                     {
                         UserName = "user"
                     };
-                    await userManager.CreateAsync(newUser, "Test123!");
+                    await userManager.CreateAsync(newUser, "Haslo56!");
                     await userManager.AddToRoleAsync(newUser, UserRoles.User);
                 }
             }

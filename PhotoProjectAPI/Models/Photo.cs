@@ -19,19 +19,12 @@ namespace PhotoProjectAPI.Models
         [NotMapped]
         public IFormFile ImageFile { get; set; }
         public string ImageName { get; set; }
-
-        // relationship photo ---< rates
         public int UpVotes { get; set; }
         public int DownVotes { get; set; }
         public List<Rate>? Rates { get; set; }
-
-        // relationship photos >--< albums 
         public List<AlbumPhoto>? AlbumsPhotos { get; set; }
-
-        // relationship photo -----< comments
         public List<Comment>? Comments { get; set; }
 
-        // relationship user ---< photos
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }

@@ -21,7 +21,7 @@ namespace PhotoProjectAPI.Controllers
             _albumService = albumService;
         }
 
-        [HttpGet("get-all-albums")]
+        [HttpGet("GetAll")]
         public IActionResult GetAlbums()
         {
             var allAlbums = _albumService.GetAllAlbums();
@@ -36,7 +36,7 @@ namespace PhotoProjectAPI.Controllers
             return Ok(allAlbums);
         }
 
-        [HttpGet("get-album-by-id/{albumId}")]
+        [HttpGet("GetAlbum/{albumId}")]
         public IActionResult GetAlbumById(int albumId)
         {
             var album = _albumService.GetAlbumById(albumId);
@@ -52,7 +52,7 @@ namespace PhotoProjectAPI.Controllers
                 return Ok(album);
             }
         }
-        [HttpGet("get-album(s)-by-name/{albumName}")]
+        [HttpGet("GetByName/{albumName}")]
         public IActionResult GetAlbumsByName(string albumName)
         {
             bool isAdmin = User.IsInRole("ADMIN");
@@ -71,28 +71,7 @@ namespace PhotoProjectAPI.Controllers
 
             return Ok(filteredAlbums);
         }
-        [HttpGet("get-albums-by-user-name/{userName}")]
-        public IActionResult GetAlbumsByUserName(string userName)
-        {
-            bool isAdmin = User.IsInRole("ADMIN");
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var filteredAlbums = _albumService.GetAlbumsByAuthorName(userName);
-
-            if (filteredAlbums == null)
-                return NotFound();
-            else if (filteredAlbums.Count == 0)
-                return NotFound();
-            else
-            {
-                if (isAdmin)
-                    filteredAlbums = filteredAlbums;
-                else
-                    filteredAlbums = filteredAlbums.Where(p => p.Access == Data.AccessLevel.Public || p.UserId == userId).ToList();
-
-                return Ok(filteredAlbums);
-            }
-        }
-        [HttpGet("get-albums-by-user-id/{authorId}")]
+        [HttpGet("GetByAuthorId/{authorId}")]
         public IActionResult GetAlbumsByUserId(string authorId)
         {
             bool isAdmin = User.IsInRole("ADMIN");
@@ -114,7 +93,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-photos-by-ids")]
+        [HttpPost("AddPhotos")]
         public IActionResult AddPhotosByIds(int albumId, List<int> photoIds)
         {
             string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -127,7 +106,7 @@ namespace PhotoProjectAPI.Controllers
                 return BadRequest();
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-album")]
+        [HttpPost("AddAlbum")]
         public IActionResult AddAlbumWithPhoto([FromForm] AlbumVM album)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -138,7 +117,7 @@ namespace PhotoProjectAPI.Controllers
             return Ok(album);
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("update-album-by-id/{albumId}")]
+        [HttpPut("UpdateAlbum/{albumId}")]
         public IActionResult UpdateAlbumById(int albumId, [FromForm] AlbumUpdateVM album)
         {
             string userId = _albumService.GetUserIdByAlbumId(albumId);
@@ -160,7 +139,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("change-album-access-level/{albumId}")]
+        [HttpPut("ChangeAccess/{albumId}")]
         public IActionResult ChangeAccess(int albumId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -174,7 +153,7 @@ namespace PhotoProjectAPI.Controllers
                 return Forbid();
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("delete-album-by-id/{albumId}")]
+        [HttpDelete("DeleteAlbum/{albumId}")]
         public IActionResult DeleteAlbumById(int albumId)
         {
             bool isAdmin = User.IsInRole("ADMIN");
@@ -196,7 +175,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("remove-photos-by-ids")]
+        [HttpDelete("RemovePhotos")]
         public IActionResult RemovePhotosByIds(int albumId, List<int> photoIds)
         {
             string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

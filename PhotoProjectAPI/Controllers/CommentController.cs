@@ -21,7 +21,7 @@ namespace PhotoProjectAPI.Controllers
             _commentService = commentService;
             _photoService = photoService;
         }
-        [HttpGet("get-all-comments-by-photo/{photoId}")]
+        [HttpGet("GetComments/{photoId}")]
         public IActionResult GetCommentsByPhotoId(int photoId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -33,12 +33,9 @@ namespace PhotoProjectAPI.Controllers
                 var obj = _commentService.GetAllCommentsByPhoto(photoId);
                 return Ok(obj);
             }
-
-
-
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpGet("delete-comment-by-id/{commentId}")]
+        [HttpGet("DeleteComment/{commentId}")]
         public IActionResult DeleteCommentById(int commentId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -55,7 +52,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-comment-to-photo/{photoId}")]
+        [HttpPost("AddComment/{photoId}")]
         public IActionResult AddCommentToPhoto(int photoId, CommentVM comment)
         {
             var photo = _photoService.GetPhotoById(photoId);

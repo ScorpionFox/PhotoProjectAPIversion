@@ -31,7 +31,7 @@ namespace PhotoProjectAPI.Controllers
             _configuration = configuration;
             _tokenValidationParameters = tokenValidationParameters;
         }
-        [HttpPost("register-user")]
+        [HttpPost("Registration")]
         public async Task<IActionResult> Register([FromForm] RegisterVM register)
         {
             if (!ModelState.IsValid)
@@ -54,7 +54,7 @@ namespace PhotoProjectAPI.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest("Registration failed. \r\nThe password must be at least 6 characters long and include at least 1 uppercase letter, 1 special character, and 1 digit. For example Test123!");
+                return BadRequest("Registration failed. \r\nThe password must be at least 6 characters long and include at least 1 uppercase letter, 1 special character, and 1 digit. For example Haslo56!");
             }
 
             return Created(nameof(Register), $"User '{register.UserName}' has been added succesfully.");
@@ -118,7 +118,7 @@ namespace PhotoProjectAPI.Controllers
 
             return response;
         }
-        [HttpPost("login-user")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromForm] LoginVM login)
         {
             if (!ModelState.IsValid)
@@ -134,7 +134,7 @@ namespace PhotoProjectAPI.Controllers
 
             return Unauthorized();
         }
-        [HttpPost("refresh-token")]
+        [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken([FromForm] TokenRequestVM tokenReq)
         {
             try
@@ -156,10 +156,8 @@ namespace PhotoProjectAPI.Controllers
 
             try
             {
-                // checks JWT's token format
                 var tokenInVerification = jwtTokenHandler.ValidateToken(tokenReq.Token, _tokenValidationParameters, out var validatedToken);
 
-                // encryption algorithm
                 if (validatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
@@ -167,33 +165,27 @@ namespace PhotoProjectAPI.Controllers
                         return null;
                 }
 
-                // checks validate expire date
                 var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                 var expireDate = UnixTimeStampToDateTimeInUTC(utcExpireDate);
                 if (expireDate > DateTime.UtcNow)
                     throw new Exception("The token has not reached its expiration");
 
-                // checks if token exists in database
                 var dbRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(n => n.Token == tokenReq.RefreshToken);
                 if (dbRefreshToken != null)
                     throw new Exception("No matching refresh token found in the database");
                 else
                 {
-                    // checks validate id
                     var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
 
                     if (dbRefreshToken.JwtId != jti)
                         throw new Exception("Token doesn't match");
 
-                    // checks refresh token expiration
                     if (dbRefreshToken.DateExpire <= DateTime.UtcNow)
                         throw new Exception("Your refresh token has expired. Please log in again.");
 
-                    // checks if refresh token is revoked
                     if (dbRefreshToken.IsRevoked)
                         throw new Exception("Refresh token has been invalidated.");
 
-                    // generates new token with existing refresh token
                     var dbUser = await _userManager.FindByIdAsync(dbRefreshToken.UserId);
                     var newTokenResponse = GenerateJwtTokenAsync(dbUser, tokenReq.RefreshToken);
 
@@ -204,7 +196,6 @@ namespace PhotoProjectAPI.Controllers
             {
                 var dbRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(n => n.Token == tokenReq.RefreshToken);
 
-                // generates new token with existing refresh token
                 var dbUser = await _userManager.FindByIdAsync(dbRefreshToken.UserId);
                 var newTokenResponse = GenerateJwtTokenAsync(dbUser, tokenReq.RefreshToken);
 

@@ -7,8 +7,6 @@ namespace PhotoProjectAPI
 {
     public class Startup
     {
-        // Dodaje komentarz zeby sprawdzic commita
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

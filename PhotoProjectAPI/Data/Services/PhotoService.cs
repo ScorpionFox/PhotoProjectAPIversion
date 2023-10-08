@@ -214,15 +214,6 @@ namespace PhotoProjectAPI.Data.Services
                 return "Accessibility has been changed to public";
             }
         }
-        public List<PhotoDto> GetPhotosByAuthorName(string authorName)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.UserName == authorName);
-
-            if (user == null)
-                return null;
-            else
-                return GetAllPhotos().Where(p => p.UserId == user.Id).ToList();
-        }
         public List<PhotoDto> GetPhotosByAuthorId(string authorId)
         {
             var data = GetAllPhotos().Where(p => p.UserId == authorId).ToList();

@@ -111,7 +111,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseSwaggerUI(); //potrzebne?
+app.UseSwaggerUI();
 
 AppDbSeeder.SeedUsersAndRolesAsync(app).Wait();
 

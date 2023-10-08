@@ -28,7 +28,7 @@ namespace PhotoProjectAPI.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [HttpGet("get-all-photos")]
+        [HttpGet("GetAll")]
         public IActionResult GetPhotos()
         {
             var allPhotos = _photoService.GetAllPhotos();
@@ -43,7 +43,7 @@ namespace PhotoProjectAPI.Controllers
             return Ok(allPhotos);
         }
 
-        [HttpGet("get-photo-by-id/{photoId}")]
+        [HttpGet("GetPhoto/{photoId}")]
         public IActionResult GetPhotoById(int photoId)
         {
             var photo = _photoService.GetPhotoById(photoId);
@@ -60,7 +60,7 @@ namespace PhotoProjectAPI.Controllers
             }
 
         }
-        [HttpGet("get-photo(s)-by-name")]
+        [HttpGet("GetPhoto/{photoName}")]
         public IActionResult GetPhotosByName(string photoName) 
         {
             bool isAdmin = User.IsInRole("ADMIN");
@@ -80,28 +80,7 @@ namespace PhotoProjectAPI.Controllers
 
             return Ok(filteredPhotos);
         }
-        [HttpGet("get-photos-by-user-name/{userName}")]
-        public IActionResult GetPhotosByUserName(string userName)
-        {
-            bool isAdmin = User.IsInRole("ADMIN");
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var filteredPhotos = _photoService.GetPhotosByAuthorName(userName);
-
-            if (filteredPhotos == null)
-                return NotFound();
-            else if (filteredPhotos.Count == 0)
-                return NotFound();
-            else
-            {
-                if (isAdmin)
-                    filteredPhotos = filteredPhotos;
-                else
-                    filteredPhotos = filteredPhotos.Where(p => p.Access == Data.AccessLevel.Public || p.UserId == userId).ToList();
-
-                return Ok(filteredPhotos);
-            }
-        }
-        [HttpGet("get-photos-by-user-id/{authorId}")]
+        [HttpGet("GetPhotos/{authorId}")]
         public IActionResult GetPhotosByUserId(string authorId)
         {
             bool isAdmin = User.IsInRole("ADMIN");
@@ -121,7 +100,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-photo")]
+        [HttpPost("AddPhoto")]
         public async Task<IActionResult> AddPhoto([FromForm] PhotoVM photo)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -129,7 +108,7 @@ namespace PhotoProjectAPI.Controllers
             return Ok(photo);
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("give-upvote/{photoId}")]
+        [HttpPost("UpvotePhoto/{photoId}")]
         public IActionResult GiveUpvote(int photoId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -147,7 +126,7 @@ namespace PhotoProjectAPI.Controllers
         }
 
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("give-downvote/{photoId}")]
+        [HttpPost("DownvotePhoto/{photoId}")]
         public IActionResult GiveDownvote(int photoId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -164,7 +143,7 @@ namespace PhotoProjectAPI.Controllers
                 return Forbid();
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("update-photo-by-id/{photoId}")]
+        [HttpPut("UpdatePhoto/{photoId}")]
         public IActionResult UpdatePhotoById(int photoId, [FromForm] PhotoUpdateVM photo)
         {
             string userId = _photoService.GetUserIdByPhotoId(photoId);
@@ -186,7 +165,7 @@ namespace PhotoProjectAPI.Controllers
             }
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("change-photo-access-level")]
+        [HttpPut("ChangeAccess")]
         public IActionResult ChangeAccess(int photoId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -200,7 +179,7 @@ namespace PhotoProjectAPI.Controllers
                 return Forbid();
         }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("delete-photo-by-id/{photoId}")]
+        [HttpDelete("DeletePhoto/{photoId}")]
         public IActionResult DeletePhotoById(int photoId)
         {
             bool isAdmin = User.IsInRole("ADMIN");

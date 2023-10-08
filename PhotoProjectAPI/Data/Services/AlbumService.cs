@@ -296,62 +296,14 @@ namespace PhotoProjectAPI.Data.Services
             {
                 album.Access = AccessLevel.Private;
                 _context.SaveChanges();
-                return "Changed access level to private";
+                return "Accessibility has been changed to private";
             }
             else
             {
                 album.Access = AccessLevel.Public;
                 _context.SaveChanges();
-                return "Changed access level to public";
+                return "Accessibility has been changed to public";
             }
-        }
-        public string ChangeAccessByIdForAll(int albumId)
-        {
-            var album = GetAlbumByIdPriv(albumId);
-            List<Photo> photos = _context.AlbumsPhotos.Where(a => a.AlbumId == albumId).Select(c => c.Photo).ToList();
-
-            if (album == null)
-                return null;
-            else if (album.Access == AccessLevel.Public)
-            {
-                foreach (var photo in photos)
-                {
-                    photo.Access = AccessLevel.Private;
-                }
-                album.Access = AccessLevel.Private;
-                _context.SaveChanges();
-                return "Changed access level to private";
-            }
-            else
-            {
-                foreach (var photo in photos)
-                {
-                    photo.Access = AccessLevel.Public;
-                }
-                album.Access = AccessLevel.Public;
-                _context.SaveChanges();
-                return "Changed access level to public";
-            }
-        }
-        public string DeleteAlbumWithPhotos(int albumId)
-        {
-            var album = GetAlbumByIdPriv(albumId);
-            string stateChanged = "Could not delete!";
-            if (album != null)
-            {
-                List<Photo> photos = _context.AlbumsPhotos.Where(a => a.AlbumId == albumId).Select(c => c.Photo).ToList();
-                List<AlbumPhoto> albumsPhotos = new List<AlbumPhoto>();
-                foreach (var photo in photos)
-                {
-                    var ap = GetAlbumPhotoByIds(albumId, photo.Id);
-                    _context.AlbumsPhotos.Remove(ap);
-                    _context.Photos.Remove(photo);
-                }
-                _context.Albums.Remove(album);
-                _context.SaveChanges();
-                stateChanged = "Deleted successfully!";
-            }
-            return stateChanged;
         }
     }
 }

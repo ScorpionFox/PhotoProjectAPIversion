@@ -37,7 +37,23 @@ namespace PhotoProjectAPI.Controllers
 
 
         }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpGet("delete-comment-by-id/{commentId}")]
+        public IActionResult DeleteCommentById(int commentId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
 
+            if (_commentService.CommentExists(commentId) == false)
+                return NotFound();
+            else if (_commentService.HasPriveleges(commentId, userId, isAdmin) == false)
+                return Forbid();
+            else
+            {
+                _commentService.DeleteCommentById(commentId);
+                return Ok();
+            }
+        }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
         [HttpPost("add-comment-to-photo/{photoId}")]
         public IActionResult AddCommentToPhoto(int photoId, CommentVM comment)
@@ -59,24 +75,6 @@ namespace PhotoProjectAPI.Controllers
                     _commentService.AddComment(comment, userId, photoId);
                     return Ok();
                 }
-            }
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpGet("delete-comment-by-id/{commentId}")]
-        public IActionResult DeleteCommentById(int commentId)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            if (_commentService.CommentExists(commentId) == false)
-                return NotFound();
-            else if (_commentService.HasPriveleges(commentId, userId, isAdmin) == false)
-                return Forbid();
-            else
-            {
-                _commentService.DeleteCommentById(commentId);
-                return Ok();
             }
         }
     }

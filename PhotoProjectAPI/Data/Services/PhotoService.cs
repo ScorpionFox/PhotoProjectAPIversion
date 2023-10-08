@@ -205,13 +205,13 @@ namespace PhotoProjectAPI.Data.Services
             {
                 photo.Access = AccessLevel.Private;
                 _context.SaveChanges();
-                return "Changed access level to private";
+                return "Accessibility has been changed to private";
             }
             else
             {
                 photo.Access = AccessLevel.Public;
                 _context.SaveChanges();
-                return "Changed access level to public";
+                return "Accessibility has been changed to public";
             }
         }
         public List<PhotoDto> GetPhotosByAuthorName(string authorName)
@@ -234,10 +234,6 @@ namespace PhotoProjectAPI.Data.Services
             var dataFiltered = data.Where(n => n.Name.IndexOf(photoName, StringComparison.OrdinalIgnoreCase) != -1);
             return dataFiltered.ToList();
 
-        }
-        public Photo GetPhotoByFileName(string fileName)
-        {
-            return _context.Photos.FirstOrDefault(c => c.ImageName == fileName);
         }
         public bool HasAccess(int photoId, string userId, bool isAdmin)
         {
@@ -265,6 +261,10 @@ namespace PhotoProjectAPI.Data.Services
             else
                 return photo.UserId;
         }
+
+
+
+        //comments
         public void AddUpvote(int photoId)
         {
             var photo = GetPhotoByIdPriv(photoId);

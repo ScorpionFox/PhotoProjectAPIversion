@@ -4,10 +4,10 @@ namespace PhotoProjectAPI.Data.ViewModels.Authentication
 {
     public class LoginVM
     {
-        [Required(ErrorMessage = "Username is required")]
+        [Required(ErrorMessage = "Please provide Username")]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required(ErrorMessage = "Please provide Password")]
         public string Password { get; set; }
     }
 }

@@ -22,7 +22,6 @@ namespace PhotoProjectAPI.Data.Interfaces
         public List<PhotoDto> GetPhotosByAuthorName(string authorName);
         public List<PhotoDto> GetPhotosByAuthorId(string authorId);
         public List<PhotoDto> GetPhotosByName(string photoName);
-        public Photo GetPhotoByFileName(string fileName);
         public bool HasAccess(int photoId, string userId, bool isAdmin);
         public bool HasPriveleges(int photoId, string userId, bool isAdmin);
         public string GetUserIdByPhotoId(int photoId);

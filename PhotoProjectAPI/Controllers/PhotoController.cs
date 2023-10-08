@@ -29,7 +29,7 @@ namespace PhotoProjectAPI.Controllers
         }
 
         [HttpGet("get-all-photos")]
-        public IActionResult GetPhotos()         // 5. Przeszukiwanie zdjęć na podstawie praw użytkownika (admin dostęp do wszystkiego)
+        public IActionResult GetPhotos()
         {
             var allPhotos = _photoService.GetAllPhotos();
             bool isAdmin = User.IsInRole("ADMIN");
@@ -60,114 +60,8 @@ namespace PhotoProjectAPI.Controllers
             }
 
         }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("update-photo-by-id/{photoId}")] // 3. Edycja opisów (TAGI, SZCZEGÓŁY, APARAT) // 4. Zmiana status zdjęcia (PRIV/PUBLIC)
-        public IActionResult UpdatePhotoById(int photoId, [FromForm] PhotoUpdateVM photo)
-        {
-            string userId = _photoService.GetUserIdByPhotoId(photoId);
-            bool isAdmin = User.IsInRole("ADMIN");
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!_photoService.PhotoExists(photoId))
-            {
-                return NotFound();
-            }
-            else
-            {
-                if (_photoService.HasPriveleges(photoId, currUserId, isAdmin))
-                {
-                    var photoUpd = _photoService.UpdatePhotoById(photoId, photo, userId);
-                    return Ok(photoUpd); ;
-                }
-                else
-                    return Forbid();
-            }
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("delete-photo-by-id/{photoId}")] // 2. Usuwanie zdjęć
-        public IActionResult DeletePhotoById(int photoId)
-        {
-            bool isAdmin = User.IsInRole("ADMIN");
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!_photoService.PhotoExists(photoId))
-            {
-                return NotFound();
-            }
-            else
-            {
-                if (_photoService.HasPriveleges(photoId, currUserId, isAdmin))
-                {
-                    _photoService.DeletePhotoById(photoId);
-                    return Ok();
-                }
-                else
-                    return Forbid();
-            }
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-photo")] // 1. Dodawanie zdjęć (TAG, AUTOR, SZCZEGÓŁY, APARAT, STATUS) // 1:4. Generowanie miniatur dla zdjęć
-        public async Task<IActionResult> AddPhoto([FromForm] PhotoVM photo)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            _photoService.AddPhoto(photo, userId);
-            return Ok(photo);
-        }
-        [HttpGet("show-photo-by-file-name")]
-        public async Task<IActionResult> ShowPhotoByFileName([FromQuery] string fileName)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-            var photo = _photoService.GetPhotoByFileName(fileName);
-            string path = _photoService.GetPathByFileName(fileName);
-
-            if (!System.IO.File.Exists(path))
-                return NotFound();
-            else if (!_photoService.HasAccess(photo.Id, userId, isAdmin))
-                return Forbid();
-            else
-            {
-                byte[] b = System.IO.File.ReadAllBytes(path);
-                return File(b, "image/jpg");
-            }
-        }
-
-        [HttpGet("download-photo-by-file-name")] // 6. Możliwość pobierania zdjęć zgodnie z prawami (publiczne, własne, admin)
-        public async Task<IActionResult> DownloadPhoto(string fileName)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-            var photo = _photoService.GetPhotoByFileName(fileName);
-            string path = _photoService.GetPathByFileName(fileName);
-
-            if (!System.IO.File.Exists(path))
-                return NotFound();
-            else if (!_photoService.HasAccess(photo.Id, userId, isAdmin))
-                return Forbid();
-            else
-            {
-                byte[] b = _photoService.DownloadPhoto(fileName);
-                return File(b, "application/octet-stream", Path.GetFileName(path));
-            }
-        } 
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("change-photo-access-level")]
-        public IActionResult ChangeAccess(int photoId)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            if (!_photoService.PhotoExists(photoId) == false)
-                return NotFound();
-            else if (_photoService.HasPriveleges(photoId, userId, isAdmin))
-                return Ok(_photoService.ChangeAccessById(photoId));
-            else
-                return Forbid();
-        }
         [HttpGet("get-photo(s)-by-name")]
-        public IActionResult GetPhotosByName(string photoName)         // 5. Przeszukiwanie zdjęć na podstawie praw użytkownika (admin dostęp do wszystkiego)
+        public IActionResult GetPhotosByName(string photoName) 
         {
             bool isAdmin = User.IsInRole("ADMIN");
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -186,7 +80,6 @@ namespace PhotoProjectAPI.Controllers
 
             return Ok(filteredPhotos);
         }
-
         [HttpGet("get-photos-by-user-name/{userName}")]
         public IActionResult GetPhotosByUserName(string userName)
         {
@@ -227,7 +120,14 @@ namespace PhotoProjectAPI.Controllers
                 return Ok(filteredPhotos);
             }
         }
-
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPost("add-photo")]
+        public async Task<IActionResult> AddPhoto([FromForm] PhotoVM photo)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _photoService.AddPhoto(photo, userId);
+            return Ok(photo);
+        }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
         [HttpPost("give-upvote/{photoId}")]
         public IActionResult GiveUpvote(int photoId)
@@ -263,5 +163,63 @@ namespace PhotoProjectAPI.Controllers
             else
                 return Forbid();
         }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPut("update-photo-by-id/{photoId}")]
+        public IActionResult UpdatePhotoById(int photoId, [FromForm] PhotoUpdateVM photo)
+        {
+            string userId = _photoService.GetUserIdByPhotoId(photoId);
+            bool isAdmin = User.IsInRole("ADMIN");
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!_photoService.PhotoExists(photoId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_photoService.HasPriveleges(photoId, currUserId, isAdmin))
+                {
+                    var photoUpd = _photoService.UpdatePhotoById(photoId, photo, userId);
+                    return Ok(photoUpd); ;
+                }
+                else
+                    return Forbid();
+            }
+        }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPut("change-photo-access-level")]
+        public IActionResult ChangeAccess(int photoId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
+
+            if (!_photoService.PhotoExists(photoId) == false)
+                return NotFound();
+            else if (_photoService.HasPriveleges(photoId, userId, isAdmin))
+                return Ok(_photoService.ChangeAccessById(photoId));
+            else
+                return Forbid();
+        }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpDelete("delete-photo-by-id/{photoId}")]
+        public IActionResult DeletePhotoById(int photoId)
+        {
+            bool isAdmin = User.IsInRole("ADMIN");
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!_photoService.PhotoExists(photoId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_photoService.HasPriveleges(photoId, currUserId, isAdmin))
+                {
+                    _photoService.DeletePhotoById(photoId);
+                    return Ok();
+                }
+                else
+                    return Forbid();
+            }
+        }          
     }
 }

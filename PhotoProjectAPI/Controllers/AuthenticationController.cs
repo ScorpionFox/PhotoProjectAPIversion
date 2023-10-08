@@ -35,13 +35,13 @@ namespace PhotoProjectAPI.Controllers
         public async Task<IActionResult> Register([FromForm] RegisterVM register)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Please provide all required fields");
+                return BadRequest("Please make sure all necessary information is provided");
 
             var userExists = await _userManager.FindByNameAsync(register.UserName);
 
             if (userExists != null)
             {
-                return BadRequest($"User {register.UserName} already exists.");
+                return BadRequest($"The username '{register.UserName}' is already in use. Please choose a different one.");
             }
 
             User newUser = new User()
@@ -54,10 +54,10 @@ namespace PhotoProjectAPI.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest("Registration failed. \r\nThe password must be at least 6 characters long and include at least 1 uppercase letter, 1 special character, and 1 digit. ");
+                return BadRequest("Registration failed. \r\nThe password must be at least 6 characters long and include at least 1 uppercase letter, 1 special character, and 1 digit. For example Test123!");
             }
 
-            return Created(nameof(Register), $"User {register.UserName} created.");
+            return Created(nameof(Register), $"User '{register.UserName}' has been added succesfully.");
         }
 
         private async Task<AuthenticationResultVM> GenerateJwtTokenAsync(User user, string existingRefreshToken)
@@ -122,7 +122,7 @@ namespace PhotoProjectAPI.Controllers
         public async Task<IActionResult> Login([FromForm] LoginVM login)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Please provide all required fields");
+                return BadRequest("Please make sure all necessary information is provided");
 
             var user = await _userManager.FindByNameAsync(login.UserName);
 
@@ -141,7 +141,7 @@ namespace PhotoProjectAPI.Controllers
             {
                 var result = await VerifyAndGenerateTokenAsync(tokenReq);
 
-                if (result == null) return BadRequest("Invalid tokens");
+                if (result == null) return BadRequest("Wrong tokens!");
                 else
                     return Ok(result);
             }
@@ -171,27 +171,27 @@ namespace PhotoProjectAPI.Controllers
                 var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                 var expireDate = UnixTimeStampToDateTimeInUTC(utcExpireDate);
                 if (expireDate > DateTime.UtcNow)
-                    throw new Exception("Token has not expired yet!");
+                    throw new Exception("The token has not reached its expiration");
 
                 // checks if token exists in database
                 var dbRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(n => n.Token == tokenReq.RefreshToken);
                 if (dbRefreshToken != null)
-                    throw new Exception("Refresh token does not exists in database");
+                    throw new Exception("No matching refresh token found in the database");
                 else
                 {
                     // checks validate id
                     var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
 
                     if (dbRefreshToken.JwtId != jti)
-                        throw new Exception("Token does not match");
+                        throw new Exception("Token doesn't match");
 
                     // checks refresh token expiration
                     if (dbRefreshToken.DateExpire <= DateTime.UtcNow)
-                        throw new Exception("Your refresh token has expired, please re-authenticate");
+                        throw new Exception("Your refresh token has expired. Please log in again.");
 
                     // checks if refresh token is revoked
                     if (dbRefreshToken.IsRevoked)
-                        throw new Exception("Refresh token is revoked");
+                        throw new Exception("Refresh token has been invalidated.");
 
                     // generates new token with existing refresh token
                     var dbUser = await _userManager.FindByIdAsync(dbRefreshToken.UserId);

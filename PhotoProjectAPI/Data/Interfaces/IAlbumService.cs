@@ -13,8 +13,7 @@ namespace PhotoProjectAPI.Data.Interfaces
         public AlbumDto GetAlbumById(int albumId);
         public AlbumDto UpdateAlbumById(int albumId, [FromForm] AlbumUpdateVM album, string userId);
         public void DeleteAlbumById(int albumId);
-        public AlbumPhoto GetAlbumPhotoByIds(int albumId, int photoId);
-        public bool MovePhotos(bool isAdmin, string currentUserId, int currentAlbumId, int destinationAlbumId, List<int> photoIds);
+        public AlbumPhoto GetAlbumPhotoByIds(int albumId, int photoId);       
         public bool AddPhotoByIds(bool isAdmin, string currentUserId, int albumId, List<int> photoIds);
         public bool RemovePhotoByIds(bool isAdmin, string currentUserId, int albumId, List<int> photoIds);
         public bool HasAccess(int albumId, string userId, bool isAdmin);
@@ -28,7 +27,5 @@ namespace PhotoProjectAPI.Data.Interfaces
         public List<AlbumDto> GetAlbumsByAuthorName(string authorName);
         public List<AlbumDto> GetAlbumsByAuthorId(string authorId);
         public string ChangeAccessById(int albumId);
-        public string ChangeAccessByIdForAll(int albumId);
-        public string DeleteAlbumWithPhotos(int albumId);
     }
 }

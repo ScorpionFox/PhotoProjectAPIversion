@@ -22,10 +22,5 @@
             var result = System.IO.Path.Combine(getStaticContentDirectory, fileName);
             return result;
         }
-
-
-
-
-
     }
 }

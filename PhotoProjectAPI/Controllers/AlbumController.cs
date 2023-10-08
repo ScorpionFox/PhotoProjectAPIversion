@@ -52,105 +52,6 @@ namespace PhotoProjectAPI.Controllers
                 return Ok(album);
             }
         }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("update-album-by-id/{albumId}")]
-        public IActionResult UpdateAlbumById(int albumId, [FromForm] AlbumUpdateVM album)
-        {
-            string userId = _albumService.GetUserIdByAlbumId(albumId);
-            bool isAdmin = User.IsInRole("ADMIN");
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!_albumService.AlbumExists(albumId))
-            {
-                return NotFound();
-            }
-            else
-            {
-                if (_albumService.HasPriveleges(albumId, currUserId, isAdmin))
-                {
-                    var photoUpd = _albumService.UpdateAlbumById(albumId, album, userId);
-                    return Ok(photoUpd); ;
-                }
-                else
-                    return Forbid();
-            }
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("delete-album-by-id/{albumId}")]
-        public IActionResult DeleteAlbumById(int albumId)
-        {
-            bool isAdmin = User.IsInRole("ADMIN");
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!_albumService.AlbumExists(albumId))
-            {
-                return NotFound();
-            }
-            else
-            {
-                if (_albumService.HasPriveleges(albumId, currUserId, isAdmin))
-                {
-                    _albumService.DeleteAlbumById(albumId);
-                    return Ok();
-                }
-                else
-                    return Forbid();
-            }
-        }
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-album")]
-        public IActionResult AddAlbumWithPhoto([FromForm] AlbumVM album)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-
-            _albumService.AddAlbum(album, userId, isAdmin);
-            return Ok(album);
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPut("move-photos-between-albums")]
-        public IActionResult MovePhotosBetweenAlbums(int currentAlbumId, int destinationAlbumId, List<int> PhotoIds)
-        {
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            bool statusChanged = _albumService.MovePhotos(isAdmin, currUserId, currentAlbumId, destinationAlbumId, PhotoIds);
-            if (statusChanged)
-                return Ok();
-            else
-                return BadRequest();
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpDelete("remove-photos-by-ids")]
-        public IActionResult RemovePhotosByIds(int albumId, List<int> photoIds)
-        {
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            bool statusChanged = _albumService.RemovePhotoByIds(isAdmin, currUserId, albumId, photoIds);
-            if (statusChanged)
-                return Ok();
-            else
-                return BadRequest();
-        }
-
-        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
-        [HttpPost("add-photos-by-ids")]
-        public IActionResult AddPhotosByIds(int albumId, List<int> photoIds)
-        {
-            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            bool statusChanged = _albumService.AddPhotoByIds(isAdmin, currUserId, albumId, photoIds);
-            if (statusChanged)
-                return Ok();
-            else
-                return BadRequest();
-        }
         [HttpGet("get-album(s)-by-name/{albumName}")]
         public IActionResult GetAlbumsByName(string albumName)
         {
@@ -212,7 +113,52 @@ namespace PhotoProjectAPI.Controllers
                 return Ok(filteredAlbums);
             }
         }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPost("add-photos-by-ids")]
+        public IActionResult AddPhotosByIds(int albumId, List<int> photoIds)
+        {
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
 
+            bool statusChanged = _albumService.AddPhotoByIds(isAdmin, currUserId, albumId, photoIds);
+            if (statusChanged)
+                return Ok();
+            else
+                return BadRequest();
+        }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPost("add-album")]
+        public IActionResult AddAlbumWithPhoto([FromForm] AlbumVM album)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
+
+
+            _albumService.AddAlbum(album, userId, isAdmin);
+            return Ok(album);
+        }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpPut("update-album-by-id/{albumId}")]
+        public IActionResult UpdateAlbumById(int albumId, [FromForm] AlbumUpdateVM album)
+        {
+            string userId = _albumService.GetUserIdByAlbumId(albumId);
+            bool isAdmin = User.IsInRole("ADMIN");
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!_albumService.AlbumExists(albumId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_albumService.HasPriveleges(albumId, currUserId, isAdmin))
+                {
+                    var photoUpd = _albumService.UpdateAlbumById(albumId, album, userId);
+                    return Ok(photoUpd); ;
+                }
+                else
+                    return Forbid();
+            }
+        }
         [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
         [HttpPut("change-album-access-level/{albumId}")]
         public IActionResult ChangeAccess(int albumId)
@@ -227,32 +173,40 @@ namespace PhotoProjectAPI.Controllers
             else
                 return Forbid();
         }
-        [HttpPut("change-album-and-photo-access-level")]
-        public IActionResult ChangeAccessForAll(int albumId)
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpDelete("delete-album-by-id/{albumId}")]
+        public IActionResult DeleteAlbumById(int albumId)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("ADMIN");
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!_albumService.AlbumExists(albumId))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_albumService.HasPriveleges(albumId, currUserId, isAdmin))
+                {
+                    _albumService.DeleteAlbumById(albumId);
+                    return Ok();
+                }
+                else
+                    return Forbid();
+            }
+        }
+        [Authorize(Roles = UserRoles.User + "," + UserRoles.Admin)]
+        [HttpDelete("remove-photos-by-ids")]
+        public IActionResult RemovePhotosByIds(int albumId, List<int> photoIds)
+        {
+            string currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             bool isAdmin = User.IsInRole("ADMIN");
 
-            if (_albumService.AlbumExists(albumId) == false)
-                return NotFound();
-            else if (_albumService.HasPriveleges(albumId, userId, isAdmin))
-                return Ok(_albumService.ChangeAccessByIdForAll(albumId));
+            bool statusChanged = _albumService.RemovePhotoByIds(isAdmin, currUserId, albumId, photoIds);
+            if (statusChanged)
+                return Ok();
             else
-                return Forbid();
-        }
-
-        [HttpPut("delete-album-with-photos")]
-        public IActionResult DeleteAlbumWithPhotos(int albumId)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            bool isAdmin = User.IsInRole("ADMIN");
-
-            if (_albumService.AlbumExists(albumId) == false)
-                return NotFound();
-            else if (_albumService.HasPriveleges(albumId, userId, isAdmin))
-                return Ok(_albumService.DeleteAlbumWithPhotos(albumId));
-            else
-                return Forbid();
-        }
+                return BadRequest();
+        }           
     }
 }

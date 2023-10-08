@@ -113,6 +113,6 @@ app.MapControllers();
 
 app.UseSwaggerUI();
 
-AppDbSeeder.SeedUsersAndRolesAsync(app).Wait();
+//AppDbSeeder.SeedUsersAndRolesAsync(app).Wait();
 
 app.Run();

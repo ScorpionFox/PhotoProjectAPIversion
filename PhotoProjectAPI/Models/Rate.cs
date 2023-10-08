@@ -1,20 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using PhotoProjectAPI.Models;
 
 namespace PhotoProjectAPI.Models
 {
-    public class Comment
+    public class Rate
     {
         [Key]
         public int Id { get; set; }
-        public string Comments { get; set; }
-        public int? PhotoId { get; set; }
+
+        public bool IsRated { get; set; } = false;
+        public string AuthorId { get; set; }
         [ForeignKey("PhotoId")]
         public Photo? Photo { get; set; }
-        public string? UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User User { get; set; }
 
     }
 }
